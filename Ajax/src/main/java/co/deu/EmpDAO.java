@@ -8,6 +8,60 @@ import java.util.Map;
 
 public class EmpDAO extends DAO {
 	
+	//스케줄 리스트
+	public List<Schedule> scheduleList() {
+		connect();
+		List<Schedule> list = new ArrayList<Schedule>();
+		try {
+			psmt = conn.prepareStatement("SELECT * FROM SCHEDULES ORDER BY 1");
+			rs = psmt.executeQuery();
+			while(rs.next()) {
+				Schedule sch = new Schedule();
+				sch.setTitle(rs.getString("title"));
+				sch.setStart(rs.getString("start_date"));
+				sch.setEnd(rs.getString("end_date"));
+				
+				list.add(sch);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			disconnect();
+		}
+		return list;
+	}
+	
+	//스케줄 등록
+	public int insertSchedule(Schedule sched) {
+		connect();
+		int n = -1;
+		String sql = "INSERT INTO SCHEDULES(TITLE, START_DATE, END_DATE) VALUES(?, ?, ?)";
+		try {
+			psmt = conn.prepareStatement(sql);
+			psmt.setString(1, sched.getTitle());
+			psmt.setString(2, sched.getStart());
+			psmt.setString(3, sched.getEnd());
+			n = psmt.executeUpdate();
+			if (n > 0) {
+				System.out.println(n + " 건 입력되었습니다.");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			disconnect();
+		}
+		return n;
+	}
+	
+	//스케줄 삭제
+//	public int deleteSchedule(Schedule sched) {
+//		int
+//		
+//		return ;
+//	}
+//	
+	
+	
 	//부서별 인원(차트) : 부서명 = 인원. Map<String. Integer>
 	public Map<String, Integer> getMemberByDept() {
 		Map<String, Integer> map = new HashMap<String, Integer>();
@@ -100,12 +154,12 @@ public class EmpDAO extends DAO {
 			psmt.setString(2, emp.getLastName());
 			psmt.setString(3, emp.getEmail());
 			psmt.setString(4, emp.getHireDate());
+			psmt.setInt(5, emp.getEmployeeId());
 			int r = psmt.executeUpdate();
 			System.out.println(r + "건 수정");
 			if(r > 0) {
 				return emp;
 			}
-			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -115,7 +169,19 @@ public class EmpDAO extends DAO {
 	}
 	
 	//삭제
-	
+	public void deleteEmp(Employee emp) {
+		connect();
+		String sql = "DELETE FROM EMP_TEMP WHERE EMPLOYEE_ID =?";
+		try {
+			psmt = conn.prepareStatement(sql);
+			psmt.setInt(1, emp.getEmployeeId());
+			psmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			disconnect();
+		}
+	}
 	
 	//한건조회
 

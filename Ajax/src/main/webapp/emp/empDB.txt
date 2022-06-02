@@ -1,0 +1,16 @@
+create table emp_temp as SELECT
+    * FROM employees;
+    
+desc emp_temp;
+
+select * from emp_temp;
+
+delete from emp_temp
+where employee_id > 104;
+
+SELECT
+    * FROM emp_temp;
+    
+delete from emp_temp where employee_id=209;
+    
+COMMIT;

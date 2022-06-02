@@ -16,7 +16,7 @@ import com.google.gson.GsonBuilder;
 /**
  * Servlet implementation class AjaxServlet
  */
-@WebServlet({ "/AjaxServlet", "/ajax.do" })
+@WebServlet({ "/emp/AjaxServlet", "/ajax.do" })
 public class AjaxServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -91,20 +91,23 @@ public class AjaxServlet extends HttpServlet {
 		String email =  request.getParameter("email");
 		String hdate =  request.getParameter("hdate");
 		String job =  request.getParameter("job");
+		String empId = request.getParameter("empId");
 		
 		Employee emp = new Employee();
+		
 		emp.setFirstName(fname);
 		emp.setLastName(lname);
 		emp.setEmail(email);
 		emp.setHireDate(hdate);
 		emp.setJobId(job);
+		emp.setEmployeeId(Integer.parseInt(empId));
 		
 		//등록
 		if(cmd.equals("insert")) {
 				
 			EmpDAO dao = new EmpDAO();
 			dao.insertEmp(emp);
-			
+			//emp = dao.insertEmp(emp);		//아이디 값까지 가지고 오고 싶으면
 			System.out.println(emp);
 			
 		//수정

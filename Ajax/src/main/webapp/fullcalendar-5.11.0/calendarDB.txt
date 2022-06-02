@@ -1,0 +1,10 @@
+-- title, start_date, end_date
+create table schedules(
+    title VARCHAR2(100),
+    start_date VARCHAR2(19),
+    end_date VARCHAR2(19)
+);
+select * from schedules;
+insert into schedules(title, start_date) values('meeting1', '2022-06-01');
+insert into schedules(title, start_date, end_date) values('meeting1', '2022-06-01', '2022-06-05');
+delete from schedules where title='meeting1';

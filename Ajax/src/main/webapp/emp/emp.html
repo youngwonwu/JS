@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>emp 화면</title>
+</head>
+
+<body>
+  <form name="frm" action="../ajax.do" method="post">
+    fist_name : <input type="text" name="fname"><br>      <!-- name="" 안에 파라미터 이름 들어감 -->
+    last_name : <input type="text" name="lname"><br>
+    email : <input type="email" name="email"><br>
+    hire_date : <input type="date" name="hdate"><br>
+    job_id : <input type="text" name="job" value="IT_PROG"><br>
+    <input type="hidden" name="cmd" value="insert">
+    <input type="hidden" name="empId">
+    <input type="submit" value="저장">
+    <input type="reset" value="취소">
+    <input type="button" value="수정" id="modify">
+  </form>
+
+  <h3>사원리스트</h3>
+  <div id="show">
+    <table border="1">
+      <thead>
+        <tr>
+          <th>사원번호</th>
+          <th>이름</th>
+          <th>성씨</th>
+          <th>이메일</th>
+          <th>입사일자</th>
+          <th>직무</th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
+
+  <script>
+    //수정?????????????
+    document.getElementById('modify').addEventListener('click', function() {    //콜백함수
+      myform.cmd.value = 'update';
+
+      ajaxPost = function() {
+        
+      }
+    });
+    function modifyCallBack() {
+      console.log(xhtp.responseText);
+      let data = JSON.parse(xhtp.responseText);s
+      let oldTr = document.getElementById('id', 'key_' + emp_employeeId);
+      let newTr = makeTr(data);
+    }
+
+    let myform = document.forms.frm;
+    //submit:저장할 때
+    myform.onsubmit = function(e) {
+      e.preventDefault();
+      let fname = myform.fname.value;
+      let lname = myform.lname.value;
+      let email = myform.email.value;
+      let job = myform.job.value;
+      let hdate = myform.hdate.value;
+      let cmd = myform.cmd.value;
+
+      let param = `cmd=${cmd}&fname=${fname}&lname=${lname}&email=${email}&job=${job}&hdate=${hdate}`;      //fname=${fname} 파라미터 이름, 화면에서 가져오는 이름
+      let xhtp = new XMLHttpRequest();
+      xhtp.open('POST', '../ajax.do');
+      xhtp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');    //xhtp.setRequestHeader() post방식으로 할때    //()안에 뜻 ?key=val&key1=val1
+      xhtp.send(param);
+      xhtp.onload = function() {
+        let data = JSON.parse(xhtp.responseText);
+        document.getElementById('list').append(makeTr(data));
+      }
+    }
+
+    function ajaxPost(callBackFnc) {
+      let fname = myform.fname.value;
+      let lname = myform.lname.value;
+      let email = myform.email.value;
+      let job = myform.job.value;
+      let hdate = myform.hdate.value;
+      let cmd = myform.cmd.value;
+      let empId = myform.empId.value;
+
+      let param = `cmd=${cmd}&fname=${fname}&lname=${lname}&email=${email}&job=${job}&hdate=${hdate}&empId=${empId}`;      //fname=${fname} 파라미터 이름, 화면에서 가져오는 이름
+      let xhtp = new XMLHttpRequest();
+      xhtp.open('POST', '../ajax.do');
+      xhtp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');    //xhtp.setRequestHeader() post방식으로 할때    //()안에 뜻 ?key=val&key1=val1
+      xhtp.send(param);
+      xhtp.onload = callBackFnc;
+    }
+
+
+    //리스트 출력
+    let xhtp = new XMLHttpRequest();
+    xhtp.open('get', '../ajax.do?job=json');   //Ajax/emp/emp.html
+    xhtp.send();
+    xhtp.onload = function() {
+      console.log(xhtp.responseText);
+      let data = JSON.parse(xhtp.responseText);   //[{}, {}, {}, {}, {}]
+      let list = document.getElementById('list');
+      for(let i=0; i<data.length; i++){
+        list.append(makeTr(data[i]));     //data[i] => 'employeeId', 'firstName', 'lastName', 'email', 'hireDate', 'jobId' 하나하나 담고 있다
+      }
+    }
+
+    //데이터 한건 입력
+    let fields = ['employeeId', 'firstName', 'lastName', 'email', 'hireDate', 'jobId'];
+    function makeTr(emp) {
+      let tr = document.createElement('tr');
+      tr.setAttribute('id', 'key_' + emp_employeeId);
+      tr.addEventListener('click', trClick);  //callback
+      fields.forEach(field => {
+        let td = document.createElement('td');
+        td.innerText = emp[field];
+        tr.append(td);
+      });
+      return tr;
+    }
+
+    function trClick() {
+      //tr 클릭 -> this:tr
+      //console.log(this.children[0].innerText);
+      document.forms.frm.empId.value = this.children[0].innerText;
+      document.forms.frm.fname.value = this.children[1].innerText;
+      document.forms.frm.lname.value = this.children[2].innerText;
+      document.forms.frm.email.value = this.children[3].innerText;
+      document.forms.frm.hdate.value = this.children[4].innerText;
+      document.forms.frm.job.value = this.children[5].innerText;
+
+      // hire_date substring으로 짜르기
+    }
+  </script>
+</body>
+
+</html>

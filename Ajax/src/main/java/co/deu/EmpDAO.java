@@ -8,7 +8,26 @@ import java.util.Map;
 
 public class EmpDAO extends DAO {
 	
-	
+	//부서별 인원(차트) : 부서명 = 인원. Map<String. Integer>
+	public Map<String, Integer> getMemberByDept() {
+		Map<String, Integer> map = new HashMap<String, Integer>();
+		connect();
+		String sql = "SELECT D.DEPARTMENT_NAME, COUNT(1) AS CNT "
+				+ "FROM EMPLOYEES E, DEPARTMENTS D "
+				+ "WHERE E.DEPARTMENT_ID = D.DEPARTMENT_ID "
+				+ "GROUP BY D.DEPARTMENT_NAME";
+		try {
+			psmt = conn.prepareStatement(sql);
+			rs = psmt.executeQuery();
+			while(rs.next()) {	//key=value
+				map.put(rs.getString("department_name"), rs.getInt("cnt"));
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return map;
+	}
 	
 	//리스트
 	public List<Employee> empList() {

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset='utf-8' />
+<link href='../lib/main.css' rel='stylesheet' />
+<script src='../lib/main.js'></script>
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+    let xhtp = new XMLHttpRequest();
+    xhtp.open('get', '../../ScheduleServlet');    //[{}, {}, {}]
+    xhtp.send();
+    xhtp.onload = function() {
+      
+      let events = JSON.parse(xhtp.responseText);
+      console.log(events);
+      var calendarEl = document.getElementById('calendar');
+
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        initialDate: '2022-06-02',
+        navLinks: true, // can click day/week names to navigate views
+        selectable: true,
+        selectMirror: true,
+        select: function(arg) {
+          var title = prompt('Event Title:');
+          if (title) {
+            //ajax call
+            console.log(arg);
+            let addAjax = new XMLHttpRequest();
+            addAjax.open('post', '../../ScheduleServlet');
+            addAjax.setRequestHeader('Content-type', 'application/x-www-form-urlencoded')
+            addAjax.send(`job=add&title=${title}&start=${arg.startStr}&end=${arg.endStr}`);
+            addAjax.onload = function() {
+              console.log(JSON.parse(addAjax.responseText));  //정상적으로 처리되면 {"retcode":"Success"}
+              calendar.addEvent({
+                title: title,
+                start: arg.start,
+                end: arg.end,
+                allDay: arg.allDay
+              });
+            }         
+          }
+          calendar.unselect()
+        },
+        eventClick: function(arg) {
+          if (confirm('Are you sure you want to delete this event?')) {
+            console.log(arg);
+            console.log(arg.event._def.title);  //event > _def > title 삭제
+            
+            let startStr = arg.event.startStr;
+            let endStr = arg.event.endStr;
+            let modAjax = new XMLHttpRequest();
+            modAjax.open('post', '../../ScheduleServlet');
+            modAjax.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            modAjax.send(`job=mod&title=${title}&start=${arg.startStr}&end=${arg.endStr}`);
+            ///여기도 해야함
+            // arg.event.remove()
+          }
+        },
+        editable: true,
+        dayMaxEvents: true, // allow "more" link when too many events
+        events: events
+      });
+      calendar.render();
+    }
+  });
+
+
+</script>
+<style>
+
+  body {
+    margin: 40px 10px;
+    padding: 0;
+    font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+    font-size: 14px;
+  }
+
+  #calendar {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+</style>
+</head>
+<body>
+
+  <div id='calendar'></div>
+
+</body>
+</html>
